@@ -15,13 +15,13 @@ public class C extends B {
         log.info("begin c1");
         C c1 = new C();
 
-        log.info("=================>");
-        log.info("begin c2");
-        C c2 = new C();
-
-        log.info("=================>");
-        log.info("begin a1");
-        A a1 = new A();
+//        log.info("=================>");
+//        log.info("begin c2");
+//        C c2 = new C();
+//
+//        log.info("=================>");
+//        log.info("begin a1");
+//        A a1 = new A();
 
     }
 

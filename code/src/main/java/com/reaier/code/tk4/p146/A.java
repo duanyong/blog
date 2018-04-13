@@ -16,10 +16,6 @@ public class A {
     private static int m;
 
     A() {
-        log.info("i = {}, j = {}", i, j);
-
-        j = 39;
-
         log.info("A's construction initialized");
     }
 

@@ -15,6 +15,9 @@ public class B extends A {
     public B() {
         log.info("k = {}", k);
         log.info("j = {}", j);
+
+        log.info("B's construction initialized");
+
     }
 
     private static int x2 = printInit("B's static property initialized");
