@@ -25,24 +25,30 @@ public class QuickSort {
 
     }
 
-    private static void quickSort(int[] list, int low, int height) {
-        if (low > height) {
+    private static void quickSort(int[] list, int low, int high) {
+        if (low > high) {
             return;
         }
 
         int base = list[low];
 
-        while (low < height) {
-            if (height > low && list[height] >= base) {
-                height --;
+        while (low < high) {
+            if (high > low && list[high] >= base) {
+                high --;
             }
 
-            if (low < height && list[low] <= base) {
+            if (low < high && list[low] <= base) {
                 low ++ ;
             }
 
-            swap(list, low, height);
+            if (low < high) {
+                swap(list, low, high);
+            }
         }
+
+
+
+
     }
 
     //交换i和j的值
