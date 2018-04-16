@@ -19,32 +19,29 @@ public class QuickSort {
     }
 
     QuickSort(int[] list) {
-        boolean swapped = true;
-        int bottom  = 0;
-        int top     = list.length -1;
+        int base    = list[0];
+        int left    = 0;
+        int right   = list.length -1;
 
-        while (swapped == true) {
-            swapped = false;
+    }
 
-            for (int i = bottom; i < top; ++ i) {
-                if (list[i] > list[i + 1]) {
-                    swap(list, i, i + 1);
+    private static void quickSort(int[] list, int low, int height) {
+        if (low > height) {
+            return;
+        }
 
-                    swapped = true;
-                }
+        int base = list[low];
+
+        while (low < height) {
+            if (height > low && list[height] >= base) {
+                height --;
             }
 
-            top --;
-
-            for (int j = top; j > bottom; -- j) {
-                if (list[j] < list[j -1]) {
-                    swap(list, j, j - 1);
-
-                    swapped = true;
-                }
+            if (low < height && list[low] <= base) {
+                low ++ ;
             }
 
-            bottom ++;
+            swap(list, low, height);
         }
     }
 

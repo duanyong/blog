@@ -1,0 +1,188 @@
+#java源码# 集合系列
+
+  	- Iterator 迭代器
+  		- boolean hasNext()
+  		- E next();
+  		- default void remove();
+  		- default void forEachRemaining(Consumer<? super E> action); // while (hasNext()) action.accept(next()); 将每个元素都执行action操作
+  	- Collection
+  		- int size();
+  		- boolean isEmpty();
+  		- boolean contains(Object o);
+  		- Iterator<E> iterator();		//单个执行的迭代器
+  		- Object[] toArray();			//采用Array.copyOf 深度复制
+  		- boolean add(E e);
+  		- boolean remove(Object o);
+  		- boolean containsAll(Collection<?> c);
+  		- boolean addAll(Collection<? extends E> c);
+  		- boolean removeAll(Collection<?> c);
+  		- default boolean removeIf(Predicate<? super E> filter);  	//删除存在的元素
+  		- boolean retainAll(Collection<?> c);						//两个collection是否有交集
+  		- default Spliterator<E> spliterator();						//分流器
+  		- 未完(default Stream<E> stream(), default Stream<E> parallelStream())
+
+  		- List	有序列表
+  			- boolean addAll(int index, Collection<? extends E> c);
+  			- default void sort(Comparator<? super E> c); 		//排序
+  			```
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            default void sort(Comparator<? super E> c) {
+                Object[] a = this.toArray();
+                Arrays.sort(a, (Comparator) c);
+                ListIterator<E> i = this.listIterator();
+                for (Object e : a) {
+                    i.next();
+                    i.set((E) e);
+                }
+            }
+            ```
+  		- Set 	无序列表
+  		- Queue 队列 	
+  			- offer() 添加一个元素并返回true，超出队列者返回false
+  			- poll() 弹出一个元素，null表示空队列
+  			- peek() 返回队列的头元素
+
+```java
+public interface Consumer<T> {
+    void accept(T t);
+    default Consumer<T> andThen(Consumer<? super T> after) {
+        Objects.requireNonNull(after);
+        return (T t) -> { accept(t); after.accept(t); };
+    }
+}
+```
+    [示例](https://blog.csdn.net/Lirx_Tech/article/details/51484703)   
+    ```java
+    ArrayList<String> list = new ArrayList();  
+    for (int i = 0; i < 10; i++) {  
+        list.add(String.valueOf(i));  
+    }  
+
+    Iterator iterator = list.iterator();  
+    iterator.forEachRemaining(new Consumer() {  
+        @Override  
+        public void accept(Object o) {  
+            System.out.println(o);  
+            if (o.equals("3") ) {  
+              System.out.println("remove");  
+              iterator.remove();  			//出错
+            }  
+        }  
+    });  
+    ```
+    出错参考：[Java8,iterator的forEachRemaining中remove可能抛异常](https://blog.csdn.net/u011142426/article/details/78894192)
+    - 集合
+    ![集合](https://img-blog.csdn.net/20160408221840040?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center) 
+    - Collection（高度抽象的集合类）源码分析
+    ```java
+    abstract boolean         add(E object)  
+    abstract boolean         addAll(Collection<? extends E> collection)  
+    abstract void            clear()  
+    abstract boolean         contains(Object object)  
+    abstract boolean         containsAll(Collection<?> collection)  
+    abstract boolean         equals(Object object)  
+    abstract int             hashCode()  
+    abstract boolean         isEmpty()  
+    abstract Iterator<E>     iterator()  
+    abstract boolean         remove(Object object)  
+    abstract boolean         removeAll(Collection<?> collection)  
+    abstract boolean         retainAll(Collection<?> collection)  
+    default boolean          removeIf(Predicate<? super E> filter)	//按条件删除
+    abstract int             size()  
+    abstract <T> T[]         toArray(T[] array)  
+    abstract Object[]        toArray()     
+
+    //删除满足条件的元素
+    default boolean removeIf(Predicate<? super E> filter) {
+        Objects.requireNonNull(filter);
+        boolean removed = false;
+        final Iterator<E> each = iterator();
+        while (each.hasNext()) {
+            if (filter.test(each.next())) {
+                each.remove();
+                removed = true;
+            }
+        }
+        return removed;
+    }
+
+    @Override
+    default Spliterator<E> spliterator() {
+        return Spliterators.spliterator(this, 0);
+    }
+
+    default Stream<E> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
+
+    default Stream<E> parallelStream() {
+        return StreamSupport.stream(spliterator(), true);
+    }
+    ```
+    ```java
+    @FunctionalInterface
+    public interface Predicate<T> {
+        boolean test(T t);	
+    ```
+
+- List 源码分析   
+有序列表，因为每个元素都有数字下标
+```java
+    public interface List<E> extends Collection<E> {
+        int 			size();
+        boolean 		isEmpty();
+        boolean 		contains(Object o);
+        Iterator<E> 	iterator();
+        Object[] 		toArray();
+        <T> T[] 		toArray(T[] a);
+        boolean 		add(E e);
+        boolean 		remove(Object o);
+        boolean 		containsAll(Collection<?> c);
+        boolean 		addAll(Collection<? extends E> c);
+        boolean 		addAll(int index, Collection<? extends E> c);
+        boolean 		removeAll(Collection<?> c);
+        boolean 		retainAll(Collection<?> c);
+        void 			clear();
+        boolean 		equals(Object o);
+        int 			hashCode();
+        E 				get(int index);
+        E 				set(int index, E element);
+        void 			add(int index, E element);
+        E 				remove(int index);
+        int 			indexOf(Object o);
+        int 			lastIndexOf(Object o);			//从右边的索引 
+        ListIterator<E> listIterator();
+        ListIterator<E> listIterator(int index);
+        List<E> 		subList(int fromIndex, int toIndex);
+    }
+```
+    - Set 源码分析   
+        - 无序列表
+    ```java
+    public interface Set<E> extends Collection<E> {
+            int 		size();
+            boolean 	isEmpty();
+            boolean 	contains(Object o);
+            Iterator<E> iterator();
+            Object[] 	toArray();
+            <T> T[] 	toArray(T[] a);
+            boolean 	add(E e);
+            boolean 	remove(Object o);
+            boolean 	containsAll(Collection<?> c);
+            boolean 	addAll(Collection<? extends E> c);
+            boolean 	retainAll(Collection<?> c);
+            boolean 	removeAll(Collection<?> c);
+            void 		clear();
+            boolean 	equals(Object o);
+            int 		hashCode();
+            @Override
+            default Spliterator<E> spliterator() {
+                return Spliterators.spliterator(this, Spliterator.DISTINCT);
+            }
+    }
+    ```
+
+    ```java
+    public abstract class AbstractCollection<E> implements Collection<E> {
+    }
+    ```
